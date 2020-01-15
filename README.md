@@ -1,2 +1,3 @@
 # scv1
-Hi
+
+$ go mod init example
