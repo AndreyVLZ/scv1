@@ -7,12 +7,13 @@ import (
 )
 
 func main() {
-
+	mRequest()
 }
 
 func mRequest() {
 	//resp, err := http.Get("https://httpbin.org/get")
-	resp, err := http.Get("")
+	// resp, err := http.Get("https://soundcloud.com/grum/under-your-skin-original-mix")
+	resp, err := http.Get("https://a-v2.sndcdn.com/assets/0-b93ede05-3.js")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -22,6 +23,6 @@ func mRequest() {
 		log.Fatalln(err)
 	}
 
-	log.Println(string(body))
+	log.Println("HI " + string(body))
 
 }
