@@ -14,16 +14,96 @@ import (
 	"github.com/quangngotan95/go-m3u8/m3u8"
 )
 
-// var x string = "Hello World"
-var ClientIdjs string = "https://a-v2.sndcdn.com/assets/49-d7adc028-3.js"
+// URLMain - ссылка для скачивания
+var URLMain string = "https://soundcloud.com/grum/under-your-skin-original-mix"
+
+var clientIdjs string = "https://a-v2.sndcdn.com/assets/49-d7adc028-3.js"
 var myclientid string = "L1Tsmo5VZ0rup3p9fjY67862DyPiWGaG"
+
+var clienID string
 
 func main() {
 	// main1()
 	// main2()
-	GetClientId()
+	// GetClientID1()
+	GetJsList(URLMain)
 }
 
+// GetJsList получение js-файлов
+func GetJsList(u string) {
+	b01 := GetBody(u)
+	a01 := MyReg(`<script crossorigin src=\"(https:\/\/a-v2\.sndcdn\.com\/assets\/[a-zA-Z0-9\-]+\.js)"><\/script>`, b01)
+	// fmt.Println(a01)
+	GetClientID(a01)
+}
+
+// GetClientID получение client_id
+func GetClientID(l [][]string) {
+	if len(l) > 0 {
+		for _, lv1 := range l {
+			if len(lv1) >= 1 {
+				fmt.Println(lv1[1])
+				b001 := GetBody(lv1[1])
+				WriteJSToFile(b001)
+				ReadJSToFile()
+				if clienID != "" {
+					var err = os.Remove("WriteJSToFile.txt")
+					if err != nil {
+						panic(err)
+					}
+					fmt.Println(clienID)
+					return
+				}
+			}
+
+		}
+	}
+}
+
+// WriteJSToFile ...
+func WriteJSToFile(s string) {
+	f1, err := os.OpenFile("WriteJSToFile.txt", os.O_CREATE|os.O_RDWR, 0666)
+	if err != nil {
+		panic(err)
+	}
+
+	l, err := f1.WriteString(s)
+	if err != nil {
+		fmt.Println(err)
+		f1.Close()
+		return
+	}
+	fmt.Println(l, "bytes written successfully")
+	err = f1.Close()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	f1.Close()
+}
+
+// ReadJSToFile ...
+func ReadJSToFile() {
+	// var res1 [][]string
+	configFile, err := ioutil.ReadFile("WriteJSToFile.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	configLines := strings.Split(string(configFile), "\n")
+	for i := 0; i < len(configLines); i++ {
+		if configLines[i] != "" {
+			// fmt.Println(configLines[i])
+			res1 := MyReg(`client_id:\"([a-zA-Z0-9]{32})\"`, configLines[i])
+			fmt.Println(res1)
+			fmt.Println(len(res1))
+			if len(res1) >= 1 {
+				clienID = res1[0][1]
+				break
+			}
+
+		}
+	}
+}
 func main1() {
 	mb := GetBody("https://soundcloud.com/grum/under-your-skin-original-mix")
 	ma := MyReg(`<script crossorigin src=\"(https:\/\/a-v2\.sndcdn\.com\/assets\/[a-zA-Z0-9\-]+\.js)"><\/script>`, mb)
@@ -70,27 +150,46 @@ func main2() {
 
 }
 
-//GetClientId ...
-func GetClientId() {
-	jsString := GetBody(ClientIdjs)
+//GetClientID1 ...gf
+func GetClientID1() {
+	jsString := GetBody(clientIdjs)
 	fmt.Println()
-	f, err := os.OpenFile("testJS.txt", os.O_APPEND|os.O_WRONLY, 0600)
+	f1, err := os.OpenFile("testJS1.txt", os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
 		panic(err)
 	}
 
-	l, err := f.WriteString(jsString)
+	l, err := f1.WriteString(jsString)
 	if err != nil {
 		fmt.Println(err)
-		f.Close()
+		f1.Close()
 		return
 	}
 	fmt.Println(l, "bytes written successfully")
-	err = f.Close()
+	err = f1.Close()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
+	configFile, err := ioutil.ReadFile("testJS1.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	configLines := strings.Split(string(configFile), "\n")
+	for i := 0; i < len(configLines); i++ {
+		if configLines[i] != "" {
+			// fmt.Println(configLines[i])
+			res := MyReg(`client_id:\"([a-zA-Z0-9]{32})\"`, configLines[i])
+			fmt.Println(res)
+			fmt.Println(len(res))
+			if len(res) >= 1 {
+				return
+			}
+
+		}
+	}
+
 }
 
 // WriteToFile ...
