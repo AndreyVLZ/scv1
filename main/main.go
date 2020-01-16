@@ -50,18 +50,38 @@ func main2() {
 	fmt.Println(mb4)
 	playlist, _ := m3u8.ReadString(mb4)
 	// fmt.Println(cmp.Diff("Hello World", "Hello Go"))
-	fmt.Println(playlist.Items[6])
-	ss := strings.Split(playlist.Items[2].String(), "\n")
-	fmt.Printf("%q\n", ss[1])
-	mb5 := GetBody(ss[1])
+	// fmt.Println(playlist.Items[6])
+	// ss := strings.Split(playlist.Items[2].String(), "\n")
+	// fmt.Printf("%q\n", ss[1])
+	// mb5 := GetBody(ss[1])
+	for _, pv := range playlist.Items {
+		ss := strings.Split(pv.String(), "\n")
+		// WriteToFile(ss[1])
+		// fmt.Printf("%q\n", ss[1])
+		// WriteToFile("222\n")
+		WriteToFile(GetBody(ss[1]))
+		// fmt.Printf("%q\n", GetBody(ss[1]))
+	}
+
 	// mb5 := GetBody("https://cf-hls-media.sndcdn.com/media/3671770/3831429/YSPVFcL40sak.128.mp3?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiKjovL2NmLWhscy1tZWRpYS5zbmRjZG4uY29tL21lZGlhLyovKi9ZU1BWRmNMNDBzYWsuMTI4Lm1wMyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTU3OTE3NjU5Mn19fV19&Signature=OdW-~cv-mV1UxzpEWWuj-YbX9sAvQd58ovB-LC0-Wa-K7EwhvVvOzU~JchEMrL49Yd8XMtI10boRhcucJppGNgbeFNdDS9Mq1mt7Ok-3JfQjbtbyY-xrOkwdEjQ9bTtr0zac9WhC2ILnFb97Xcen6IqDX1YjRK3VBVtoln3exMxnyexpNHYjMAmUF5bIshVSPMqL6a~a5NjEt6jK1bRsxfYIPpRKjrKz3AWnwCwRhO8U2MdCHg96YaWzSecF5OhO5k7WcU4L0DEFjJfxS3DvMxHTdc6KwpS4IYTwuc1e~4tEybT6J59HIsjQYXxHm7R-HrpDiEjwcN39kS1stHR9jA__&Key-Pair-Id=APKAI6TU7MMXM5DG6EPQ")
 	// fmt.Println(mb5)
-	f, err := os.Create("test.txt")
+
+}
+
+// WriteToFile ...
+func WriteToFile(s string) {
+	// f, err := os.Create("test.txt")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
+	f, err := os.OpenFile("test1.mp3", os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
-	l, err := f.WriteString(mb5)
+
+	l, err := f.WriteString(s)
 	if err != nil {
 		fmt.Println(err)
 		f.Close()
@@ -73,7 +93,6 @@ func main2() {
 		fmt.Println(err)
 		return
 	}
-
 }
 func mRequest() {
 	timeout := time.Duration(10 * time.Second)
