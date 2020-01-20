@@ -33,8 +33,11 @@ func main() {
 func GetJsList(u string) {
 	b01 := GetBody(u)
 	a01 := MyReg(`<script crossorigin src=\"(https:\/\/a-v2\.sndcdn\.com\/assets\/[a-zA-Z0-9\-]+\.js)"><\/script>`, b01)
-	// fmt.Println(a01)
 	GetClientID(a01)
+	a02 := MyReg(`https:\/\/api-v2\.soundcloud\.com\/media\/soundcloud:tracks:[0-9]+\/[0-9a-zA-Z-]+\/stream\/hls`, b01)
+
+	b03 := GetBody(a02[0][0] + "?client_id=" + clienID)
+	fmt.Println(b03)
 }
 
 // GetClientID получение client_id
@@ -84,7 +87,6 @@ func WriteJSToFile(s string) {
 
 // ReadJSToFile ...
 func ReadJSToFile() {
-	// var res1 [][]string
 	configFile, err := ioutil.ReadFile("WriteJSToFile.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -92,10 +94,9 @@ func ReadJSToFile() {
 	configLines := strings.Split(string(configFile), "\n")
 	for i := 0; i < len(configLines); i++ {
 		if configLines[i] != "" {
-			// fmt.Println(configLines[i])
 			res1 := MyReg(`client_id:\"([a-zA-Z0-9]{32})\"`, configLines[i])
-			fmt.Println(res1)
-			fmt.Println(len(res1))
+			// fmt.Println(res1)
+			// fmt.Println(len(res1))
 			if len(res1) >= 1 {
 				clienID = res1[0][1]
 				break
